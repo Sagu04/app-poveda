@@ -37,8 +37,18 @@ from db import (
     obtener_datos_grafica_dinamicos
 )
 
-app = Flask(__name__)
+import os
+from flask import Flask
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, "templates"),
+    static_folder=os.path.join(BASE_DIR, "static")
+)
+
+from db import crear_tablas
 crear_tablas()
 
 def generar_graficas(jugador_id):
