@@ -48,8 +48,10 @@ app = Flask(
     static_folder=os.path.join(BASE_DIR, "static")
 )
 
-from db import crear_tablas
+from webapp.db import crear_tablas
 crear_tablas()
+
+os.makedirs(os.path.join(BASE_DIR, "static", "graficas"), exist_ok=True)
 
 def generar_graficas(jugador_id):
     datos = obtener_datos_grafica(jugador_id)
