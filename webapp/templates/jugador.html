@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Jugador {{ jugador[1] }}{% endblock %}
+
+{% block content %}
+    <h1>{{ jugador[1] }}</h1>
+
+    <h2>Añadir resultados físicos</h2>
+
+    <form method="POST">
+        <label>Fecha:</label>
+        <input type="date" name="fecha" required>
+
+        <br><br>
+
+        {% for prueba in pruebas %}
+            <label>{{ prueba[1] }} ({{ prueba[2] }}):</label>
+            <input type="number" step="any" name="prueba_{{ prueba[0] }}" placeholder="Valor">
+            <br><br>
+        {% endfor %}
+
+        <button type="submit">Guardar resultados</button>
+    </form>
+
+    <hr style="margin:40px 0;">
+
+    <h2>Historial de resultados</h2>
+
+    <table border="1" cellpadding="8" cellspacing="0" style="width:100%; border-collapse:collapse;">
+        <tr>
+            <th>Prueba</th>
+            <th>Unidad</th>
+            <th>Fecha</th>
+            <th>Valor</th>
+        </tr>
+
+        {% for r in resultados %}
+        <tr>
+            <td>{{ r[0] }}</td>
+            <td>{{ r[1] }}</td>
+            <td>{{ r[2] }}</td>
+            <td>{{ r[3] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr style="margin:40px 0;">
+
+    <h2>Evolución</h2>
+
+    {% for nombre_prueba, ruta in graficas.items() %}
+        <h3>{{ nombre_prueba }}</h3>
+        <img src="/{{ ruta }}" style="width:100%; max-width:900px; margin-bottom:30px;">
+    {% endfor %}
+
+    <br>
+    <a class="btn" href="/equipo/{{ jugador[2] }}">⬅ Volver al equipo</a>
+{% endblock %}

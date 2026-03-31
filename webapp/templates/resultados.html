@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Resultados{% endblock %}
+
+{% block content %}
+    <h1>Resultados</h1>
+
+    <form method="GET">
+        <select name="categoria">
+            <option value="">Todas las categorías</option>
+            {% for c in categorias %}
+                <option value="{{ c }}" {% if categoria_actual == c %}selected{% endif %}>
+                    {{ c }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="grupo">
+            <option value="">Todos los grupos</option>
+            {% for g in grupos %}
+                <option value="{{ g }}" {% if grupo_actual == g %}selected{% endif %}>
+                    {{ g }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="equipo_id">
+            <option value="">Todos los equipos</option>
+            {% for equipo in equipos %}
+                <option value="{{ equipo[0] }}" {% if equipo_actual == equipo[0]|string %}selected{% endif %}>
+                    {{ equipo[1] }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Filtrar</button>
+    </form>
+
+    <table>
+        <tr>
+            <th>Equipo</th>
+            <th>Jugador</th>
+            <th>Fecha</th>
+            <th>Prueba</th>
+            <th>Valor</th>
+            <th>Unidad</th>
+        </tr>
+
+        {% for r in resultados %}
+        <tr>
+            <td>{{ r[0] }}</td>
+            <td>{{ r[1] }}</td>
+            <td>{{ r[2] }}</td>
+            <td>{{ r[3] }}</td>
+            <td>{{ r[4] }}</td>
+            <td>{{ r[5] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

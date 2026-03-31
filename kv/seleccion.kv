@@ -1,0 +1,60 @@
+<SeleccionScreen>
+
+    MDBoxLayout:
+        orientation: "vertical"
+
+        MDTopAppBar:
+            title: "APP Datos Físicos"
+            elevation: 4
+
+        MDBoxLayout:
+            orientation: "vertical"
+            padding: 30
+            spacing: 20
+
+            MDLabel:
+                text: "Seleccionar temporada"
+                halign: "center"
+
+            Spinner:
+                text: "Seleccionar temporada"
+                values: root.temporadas
+                on_text: root.seleccionar_temporada(self.text)
+
+            MDLabel:
+                text: "Seleccionar equipo"
+                halign: "center"
+
+            Spinner:
+                text: "Seleccionar equipo"
+                values: root.equipos
+                on_text: root.seleccionar_equipo(self.text)
+
+            MDLabel:
+                text: "Seleccionar jugador"
+                halign: "center"
+
+            Spinner:
+                text: "Seleccionar jugador"
+                values: root.jugadores
+                on_text: root.seleccionar_jugador(self.text)
+
+            MDRaisedButton:
+                text: "Introducir pruebas físicas"
+                pos_hint: {"center_x": 0.5}
+                on_press: app.root.current = "pruebas"
+
+            MDRaisedButton:
+                text: "Ver resultados"
+                pos_hint: {"center_x": 0.5}
+                on_press: app.root.current = "resultados"
+
+            MDRaisedButton:
+                text: "Comparar jugadores"
+                pos_hint: {"center_x": 0.5}
+                on_press: app.root.current = "comparacion"
+
+            MDRaisedButton:
+                text: "Gestionar equipos y jugadores"
+                pos_hint: {"center_x": 0.5}
+                on_press: app.root.current = "gestion"

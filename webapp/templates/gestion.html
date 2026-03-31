@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión{% endblock %}
+
+{% block content %}
+    <h1>Gestión de Temporadas</h1>
+
+    <form method="POST">
+        <input type="text" name="nombre_temporada" placeholder="Ej: 2025/2026" required>
+        <button type="submit">Crear temporada</button>
+    </form>
+
+    <h2>Temporadas creadas</h2>
+    <ul>
+        {% for temporada in temporadas %}
+            <li>
+                <a href="/temporada/{{ temporada[0] }}">{{ temporada[1] }}</a>
+                -
+                <a href="/eliminar_temporada/{{ temporada[0] }}"
+                   onclick="return confirm('¿Eliminar temporada completa?')"
+                   style="color:red; font-weight:bold;">
+                   Eliminar
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

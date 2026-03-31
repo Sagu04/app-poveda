@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Equipo {{ equipo[1] }}{% endblock %}
+
+{% block content %}
+    <h1>Equipo {{ equipo[1] }}</h1>
+
+    <form method="POST">
+        <input type="text" name="nombre_jugador" placeholder="Nombre del jugador" required>
+        <button type="submit">Crear jugador</button>
+    </form>
+
+    <h2>Jugadores del equipo</h2>
+    <ul>
+        {% for jugador in jugadores %}
+            <li>
+                <a href="/jugador/{{ jugador[0] }}">{{ jugador[1] }}</a>
+                -
+                <a href="/editar_jugador/{{ jugador[0] }}">Editar</a>
+                -
+                <a href="/eliminar_jugador/{{ jugador[0] }}"
+                   onclick="return confirm('¿Eliminar jugador?')"
+                   style="color:red; font-weight:bold;">
+                   Eliminar
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <a class="volver btn" href="/temporada/{{ equipo[2] }}">⬅ Volver a la temporada</a>
+{% endblock %}

@@ -1,0 +1,43 @@
+<ComparacionScreen>
+
+    BoxLayout:
+        orientation: "vertical"
+        padding: 20
+        spacing: 15
+
+        Label:
+            text: "Comparar jugadores"
+            size_hint_y: None
+            height: 40
+
+        Spinner:
+            id: jugador1
+            text: "Jugador 1"
+            values: root.jugadores
+
+        Spinner:
+            id: jugador2
+            text: "Jugador 2"
+            values: root.jugadores
+
+        Button:
+            text: "Comparar"
+            size_hint_y: None
+            height: 40
+            on_press: root.comparar()
+
+        Button:
+            text: "Ver evolución jugador 1"
+            size_hint_y: None
+            height: 40
+            on_press: root.grafica_jugador()
+
+        BoxLayout:
+            id: resultado_comparacion
+            orientation: "vertical"
+
+        Button:
+            text: "Volver"
+            size_hint_y: None
+            height: 50
+            on_press: app.root.current = "seleccion"

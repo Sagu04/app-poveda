@@ -1,0 +1,47 @@
+<ResultadosScreen>
+
+    BoxLayout:
+        orientation: "vertical"
+        padding: 20
+        spacing: 10
+
+        Label:
+            text: "Resultados de pruebas físicas"
+            size_hint_y: None
+            height: 40
+            color: 0,0,0,1
+
+        ScrollView:
+
+            GridLayout:
+                id: tabla_resultados
+                cols: 5
+                size_hint_y: None
+                height: self.minimum_height
+                row_default_height: 40
+                row_force_default: True
+                spacing: 2
+                padding: 5
+
+                # Cabecera tabla
+                Label:
+                    text: "Jugador"
+                    color: 0,0,0,1
+                Label:
+                    text: "Fecha"
+                    color: 0,0,0,1
+                Label:
+                    text: "Sprint 30m"
+                    color: 0,0,0,1
+                Label:
+                    text: "Illinois"
+                    color: 0,0,0,1
+                Label:
+                    text: "YoYo"
+                    color: 0,0,0,1
+
+        Button:
+            text: "Volver"
+            size_hint_y: None
+            height: 50
+            on_press: app.root.current = "seleccion"

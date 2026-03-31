@@ -1,0 +1,39 @@
+<PruebasScreen>
+
+    BoxLayout:
+        orientation: "vertical"
+        padding: 40
+        spacing: 15
+
+        Label:
+            text: "Pruebas físicas"
+
+        MDTextField:
+            id: fecha
+            hint_text: "Seleccionar fecha"
+            readonly: True
+
+        MDRaisedButton:
+            text: "Seleccionar fecha"
+            pos_hint: {"center_x": 0.5}
+            on_press: root.abrir_calendario()
+
+        TextInput:
+            id: sprint30
+            hint_text: "Sprint 30m"
+
+        TextInput:
+            id: illinois
+            hint_text: "Illinois"
+
+        TextInput:
+            id: yoyo
+            hint_text: "YoYo Test"
+
+        Button:
+            text: "Guardar resultados"
+            on_press: root.guardar_datos()
+
+        Button:
+            text: "Volver"
+            on_press: app.root.current = "seleccion"

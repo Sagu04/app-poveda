@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Temporada {{ temporada[1] }}{% endblock %}
+
+{% block content %}
+    <h1>Temporada {{ temporada[1] }}</h1>
+
+    <h2>Crear equipo</h2>
+    <form method="POST">
+        <input type="hidden" name="crear_equipo" value="1">
+
+        <select name="categoria" required>
+            <option value="">Seleccionar categoría</option>
+            <option value="Senior">Senior</option>
+            <option value="Juvenil">Juvenil</option>
+            <option value="Cadete">Cadete</option>
+            <option value="Infantil">Infantil</option>
+            <option value="Alevín">Alevín</option>
+            <option value="Benjamín">Benjamín</option>
+            <option value="Prebenjamín">Prebenjamín</option>
+        </select>
+
+        <input type="text" name="grupo" placeholder="Ej: Masc, Fem, A, B..." required>
+        <button type="submit">Crear equipo</button>
+    </form>
+
+    <h2>Equipos de la temporada</h2>
+
+    {% for categoria, lista in equipos.items() %}
+        {% if lista %}
+            <h2 style="margin-top:30px; border-bottom:2px solid #2d89ef;">
+                {{ categoria }}
+            </h2>
+
+            <ul>
+                {% for equipo in lista %}
+                    <li>
+                        <a href="/equipo/{{ equipo[0] }}">{{ equipo[1] }}</a>
+                        -
+                        <a href="/eliminar_equipo/{{ equipo[0] }}"
+                           onclick="return confirm('¿Eliminar equipo completo?')"
+                           style="color:red; font-weight:bold;">
+                           Eliminar
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endfor %}
+
+    <hr style="margin:40px 0;">
+
+    <h2>Crear prueba física</h2>
+    <form method="POST">
+        <input type="hidden" name="crear_prueba" value="1">
+
+        <input type="text" name="nombre_prueba" placeholder="Nombre de la prueba" required>
+        <input type="text" name="unidad" placeholder="Unidad (s, cm, m, rep...)" required>
+
+        <button type="submit">Añadir prueba</button>
+    </form>
+
+    <h2>Pruebas físicas de la temporada</h2>
+    <ul>
+        {% for prueba in pruebas %}
+            <li>
+                {{ prueba[1] }} ({{ prueba[2] }})
+                -
+                <a href="/eliminar_prueba/{{ prueba[0] }}/{{ temporada[0] }}"
+                   onclick="return confirm('¿Eliminar esta prueba física?')"
+                   style="color:red; font-weight:bold;">
+                   Eliminar
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <a class="volver btn" href="/gestion">⬅ Volver a gestión</a>
+{% endblock %}

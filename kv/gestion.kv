@@ -1,0 +1,124 @@
+<GestionScreen>:
+
+    BoxLayout:
+        orientation: "vertical"
+        padding: 20
+        spacing: 15
+
+        Label:
+            text: "Gestión del club"
+            size_hint_y: None
+            height: 40
+            color: 0, 0, 0, 1
+            font_size: 24
+
+        ScrollView:
+
+            GridLayout:
+                cols: 1
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: 15
+
+                # ---------------- TEMPORADA ----------------
+                Label:
+                    text: "Crear temporada"
+                    size_hint_y: None
+                    height: 30
+                    color: 0, 0, 0, 1
+
+                BoxLayout:
+                    size_hint_y: None
+                    height: 50
+                    spacing: 10
+
+                    TextInput:
+                        id: nueva_temporada
+                        hint_text: "Ej: 2025/2026"
+                        multiline: False
+
+                    Button:
+                        text: "Crear temporada"
+                        on_press: root.crear_temporada()
+
+                Spinner:
+                    id: temporada
+                    text: "Seleccionar temporada"
+                    values: root.temporadas
+                    size_hint_y: None
+                    height: 50
+                    on_text: root.cargar_equipos()
+
+                # ---------------- EQUIPO ----------------
+                Label:
+                    text: "Crear equipo"
+                    size_hint_y: None
+                    height: 30
+                    color: 0, 0, 0, 1
+
+                BoxLayout:
+                    size_hint_y: None
+                    height: 50
+                    spacing: 10
+
+                    TextInput:
+                        id: nuevo_equipo
+                        hint_text: "Nombre del equipo"
+                        multiline: False
+
+                    Button:
+                        text: "Crear equipo"
+                        on_press: root.crear_equipo()
+
+                Spinner:
+                    id: equipo
+                    text: "Seleccionar equipo"
+                    values: []
+                    size_hint_y: None
+                    height: 50
+
+                Button:
+                    text: "Mostrar jugadores"
+                    size_hint_y: None
+                    height: 50
+                    on_press: root.mostrar_jugadores()
+
+                # ---------------- JUGADOR ----------------
+                Label:
+                    text: "Añadir jugador"
+                    size_hint_y: None
+                    height: 30
+                    color: 0, 0, 0, 1
+
+                BoxLayout:
+                    size_hint_y: None
+                    height: 50
+                    spacing: 10
+
+                    TextInput:
+                        id: nuevo_jugador
+                        hint_text: "Nombre del jugador"
+                        multiline: False
+
+                    Button:
+                        text: "Crear jugador"
+                        on_press: root.crear_jugador()
+
+                Label:
+                    text: "Jugadores del equipo"
+                    size_hint_y: None
+                    height: 30
+                    color: 0, 0, 0, 1
+
+                BoxLayout:
+                    id: lista_jugadores
+                    orientation: "vertical"
+                    size_hint_y: None
+                    height: self.minimum_height
+                    spacing: 5
+
+        Button:
+            text: "Volver"
+            size_hint_y: None
+            height: 50
+            on_press: app.root.current = "seleccion"

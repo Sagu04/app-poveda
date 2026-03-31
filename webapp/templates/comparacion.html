@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Comparación{% endblock %}
+
+{% block content %}
+
+<h1>Comparación de jugadores</h1>
+
+<form method="GET">
+    <select name="categoria">
+        <option value="">Todas las categorías</option>
+        {% for c in categorias %}
+            <option value="{{ c }}" {% if categoria_actual == c %}selected{% endif %}>
+                {{ c }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <select name="grupo">
+        <option value="">Todos los grupos</option>
+        {% for g in grupos %}
+            <option value="{{ g }}" {% if grupo_actual == g %}selected{% endif %}>
+                {{ g }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Filtrar</button>
+</form>
+
+<form method="POST">
+    <input type="hidden" name="categoria" value="{{ categoria_actual or '' }}">
+    <input type="hidden" name="grupo" value="{{ grupo_actual or '' }}">
+    <select name="jugador1" required>
+        <option value="">Jugador 1</option>
+        {% for j in jugadores %}
+            <option value="{{ j[0] }}">{{ j[1] }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="jugador2" required>
+        <option value="">Jugador 2</option>
+        {% for j in jugadores %}
+            <option value="{{ j[0] }}">{{ j[1] }}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Comparar</button>
+</form>
+
+{% if graficas %}
+    {% for nombre_prueba, ruta in graficas.items() %}
+        <h2>{{ nombre_prueba }}</h2>
+        <img src="/{{ ruta }}" style="width:100%; max-width:900px; margin-bottom:30px;">
+    {% endfor %}
+{% endif %}
+
+
+{% endblock %}
