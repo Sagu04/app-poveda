@@ -1,7 +1,7 @@
 import os
 import matplotlib
 matplotlib.use("Agg")  # MUY IMPORTANTE en Render
-
+import matplotlib.pyplot as plt
 from flask import Flask, render_template, request, redirect, url_for
 from webapp.db import (
     crear_tablas,
@@ -484,4 +484,5 @@ def generar_graficas_comparacion_dinamicas(j1, j2):
     return rutas
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
