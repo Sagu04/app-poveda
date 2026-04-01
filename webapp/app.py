@@ -34,11 +34,15 @@ from webapp.db import (
     insertar_resultado_prueba,
     obtener_resultados_dinamicos_jugador,
     obtener_resultados_dinamicos,
-    obtener_datos_grafica_dinamicos
+    obtener_datos_grafica_dinamicos,
+    obtener_equipo_por_codigo,
+    insertar_jugador_si_no_existe
 )
 
 import os
 from flask import Flask
+import openpyxl
+from werkzeug.utils import secure_filename
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -47,6 +51,10 @@ app = Flask(
     template_folder=os.path.join(BASE_DIR, "templates"),
     static_folder=os.path.join(BASE_DIR, "static")
 )
+
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 from webapp.db import crear_tablas
 crear_tablas()
@@ -150,9 +158,14 @@ def ver_temporada(temporada_id):
         if "crear_equipo" in request.form:
             categoria = request.form["categoria"].strip()
             grupo = request.form["grupo"].strip()
+            codigo_equipo = request.form["codigo_equipo"].strip()
 
             nombre_equipo = f"{categoria} {grupo}".strip()
-            insertar_equipo(nombre_equipo, temporada_id)
+
+            if codigo_equipo:
+                insertar_equipo(nombre_equipo, temporada_id, int(codigo_equipo))
+            else:
+                insertar_equipo(nombre_equipo, temporada_id, None)
 
         # Crear prueba física
         elif "crear_prueba" in request.form:
@@ -482,6 +495,61 @@ def generar_graficas_comparacion_dinamicas(j1, j2):
         rutas[prueba] = f"static/graficas/{nombre_archivo}"
 
     return rutas
+
+@app.route("/importar_jugadores/<int:temporada_id>", methods=["GET", "POST"])
+def importar_jugadores(temporada_id):
+
+    temporada = obtener_temporada_por_id(temporada_id)
+    mensaje = None
+
+    if request.method == "POST":
+        archivo = request.files.get("archivo_excel")
+
+        if archivo and archivo.filename.endswith(".xlsx"):
+            nombre_seguro = secure_filename(archivo.filename)
+            ruta_archivo = os.path.join(app.config["UPLOAD_FOLDER"], nombre_seguro)
+            archivo.save(ruta_archivo)
+
+            wb = openpyxl.load_workbook(ruta_archivo)
+            hoja = wb["JUGADORES"]
+
+            importados = 0
+            no_encontrados = []
+
+            for fila in hoja.iter_rows(min_row=2, values_only=True):
+                # Estructura esperada:
+                # ID_Jugador | Nombre_Jugador | Equipo
+                _, nombre_jugador, codigo_equipo = fila[:3]
+
+                if not nombre_jugador or not codigo_equipo:
+                    continue
+
+                equipo = obtener_equipo_por_codigo(int(codigo_equipo), temporada_id)
+
+                if equipo:
+                    insertar_jugador_si_no_existe(str(nombre_jugador).strip(), equipo[0])
+                    importados += 1
+                else:
+                    no_encontrados.append((nombre_jugador, codigo_equipo))
+
+            mensaje = f"Importación completada: {importados} jugadores procesados."
+
+            return render_template(
+                "importar_jugadores.html",
+                temporada=temporada,
+                mensaje=mensaje,
+                no_encontrados=no_encontrados
+            )
+
+        else:
+            mensaje = "Debes subir un archivo .xlsx válido"
+
+    return render_template(
+        "importar_jugadores.html",
+        temporada=temporada,
+        mensaje=mensaje,
+        no_encontrados=[]
+    )
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

@@ -22,8 +22,9 @@ def crear_tablas():
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS equipos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT,
-        temporada_id INTEGER,
+        nombre TEXT NOT NULL,
+        codigo_equipo INTEGER,
+        temporada_id INTEGER NOT NULL,
         FOREIGN KEY (temporada_id) REFERENCES temporadas(id)
     )
     """)
@@ -70,6 +71,11 @@ def crear_tablas():
         FOREIGN KEY (prueba_id) REFERENCES tipos_prueba(id)
     )
     """)
+
+    try:
+        cursor.execute("ALTER TABLE equipos ADD COLUMN codigo_equipo INTEGER")
+    except:
+        pass
 
     conn.commit()
     conn.close()
@@ -159,13 +165,15 @@ def obtener_equipos_por_temporada(temporada_id):
     return sorted(datos, key=clave_orden)
 
 
-def insertar_equipo(nombre, temporada_id):
+def insertar_equipo(nombre, temporada_id, codigo_equipo=None):
     conn = conectar()
     cursor = conn.cursor()
+
     cursor.execute("""
-        INSERT INTO equipos (nombre, temporada_id)
-        VALUES (?, ?)
-    """, (nombre, temporada_id))
+        INSERT INTO equipos (nombre, temporada_id, codigo_equipo)
+        VALUES (?, ?, ?)
+    """, (nombre, temporada_id, codigo_equipo))
+
     conn.commit()
     conn.close()
 
@@ -591,3 +599,37 @@ def obtener_datos_grafica_dinamicos(jugador_id):
     datos = cursor.fetchall()
     conn.close()
     return datos
+
+def obtener_equipo_por_codigo(codigo_equipo, temporada_id):
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id, nombre
+        FROM equipos
+        WHERE codigo_equipo = ? AND temporada_id = ?
+    """, (codigo_equipo, temporada_id))
+
+    dato = cursor.fetchone()
+    conn.close()
+    return dato
+
+def insertar_jugador_si_no_existe(nombre, equipo_id):
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id FROM jugadores
+        WHERE nombre = ? AND equipo_id = ?
+    """, (nombre, equipo_id))
+
+    existe = cursor.fetchone()
+
+    if not existe:
+        cursor.execute("""
+            INSERT INTO jugadores (nombre, equipo_id)
+            VALUES (?, ?)
+        """, (nombre, equipo_id))
+
+    conn.commit()
+    conn.close()
