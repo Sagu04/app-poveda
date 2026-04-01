@@ -93,10 +93,14 @@ def obtener_temporadas():
 def insertar_temporada(nombre):
     conn = conectar()
     cursor = conn.cursor()
+
     cursor.execute("INSERT INTO temporadas (nombre) VALUES (?)", (nombre,))
+    temporada_id = cursor.lastrowid
+
     conn.commit()
     conn.close()
 
+    return temporada_id
 
 def obtener_temporada_por_id(temporada_id):
     conn = conectar()
@@ -630,6 +634,26 @@ def insertar_jugador_si_no_existe(nombre, equipo_id):
             INSERT INTO jugadores (nombre, equipo_id)
             VALUES (?, ?)
         """, (nombre, equipo_id))
+
+    conn.commit()
+    conn.close()
+
+def insertar_equipo_si_no_existe(nombre, temporada_id, codigo_equipo=None):
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id FROM equipos
+        WHERE nombre = ? AND temporada_id = ?
+    """, (nombre, temporada_id))
+
+    existe = cursor.fetchone()
+
+    if not existe:
+        cursor.execute("""
+            INSERT INTO equipos (nombre, temporada_id, codigo_equipo)
+            VALUES (?, ?, ?)
+        """, (nombre, temporada_id, codigo_equipo))
 
     conn.commit()
     conn.close()

@@ -36,7 +36,8 @@ from webapp.db import (
     obtener_resultados_dinamicos,
     obtener_datos_grafica_dinamicos,
     obtener_equipo_por_codigo,
-    insertar_jugador_si_no_existe
+    insertar_jugador_si_no_existe,
+    insertar_equipo_si_no_existe
 )
 
 import os
@@ -60,6 +61,77 @@ from webapp.db import crear_tablas
 crear_tablas()
 
 os.makedirs(os.path.join(BASE_DIR, "static", "graficas"), exist_ok=True)
+
+def normalizar_nombre_equipo(nombre):
+    nombre = str(nombre).strip().upper()
+
+    conversiones = {
+        "S.MASCULINO": "Senior Masc",
+        "S.FEMENINO": "Senior Fem",
+        "JUNIOR MASCULINO": "Junior Masc",
+        "JUNIOR FEMENINO": "Junior Fem",
+        "JUVENIL A": "Juvenil A",
+        "JUVENIL B": "Juvenil B",
+        "JUVENIL C": "Juvenil C",
+        "CADETE A": "Cadete A",
+        "CADETE B": "Cadete B",
+        "CADETE C": "Cadete C",
+        "INFANTIL A": "Infantil A",
+        "INFANTIL B": "Infantil B",
+        "INFANTIL C": "Infantil C",
+        "ALEVIN A": "Alevín A",
+        "ALEVIN B": "Alevín B",
+        "ALEVIN C": "Alevín C",
+        "BENJAMIN A": "Benjamín A",
+        "BENJAMIN B": "Benjamín B",
+        "PREBENJAMIN": "Prebenjamín"
+    }
+
+    return conversiones.get(nombre, nombre.title())
+
+def importar_excel_base(temporada_id):
+    ruta_archivo = os.path.join(BASE_DIR, "data", "HOJA DE TEST PA APP CON PORTADA .xlsx")
+
+    if not os.path.exists(ruta_archivo):
+        print("⚠️ No se encontró el Excel base")
+        return
+
+    wb = openpyxl.load_workbook(ruta_archivo)
+
+    # ==========================
+    # 1) IMPORTAR EQUIPOS
+    # ==========================
+    hoja_equipos = wb["EQUIPOS"]
+
+    for fila in hoja_equipos.iter_rows(min_row=2, values_only=True):
+        codigo_equipo, nombre_equipo = fila[:2]
+
+        if not codigo_equipo or not nombre_equipo:
+            continue
+
+        nombre_limpio = normalizar_nombre_equipo(nombre_equipo)
+
+        insertar_equipo_si_no_existe(
+            nombre_limpio,
+            temporada_id,
+            int(codigo_equipo)
+        )
+
+    # ==========================
+    # 2) IMPORTAR JUGADORES
+    # ==========================
+    hoja_jugadores = wb["JUGADORES"]
+
+    for fila in hoja_jugadores.iter_rows(min_row=2, values_only=True):
+        _, nombre_jugador, codigo_equipo = fila[:3]
+
+        if not nombre_jugador or not codigo_equipo:
+            continue
+
+        equipo = obtener_equipo_por_codigo(int(codigo_equipo), temporada_id)
+
+        if equipo:
+            insertar_jugador_si_no_existe(str(nombre_jugador).strip(), equipo[0])
 
 def generar_graficas(jugador_id):
     datos = obtener_datos_grafica(jugador_id)
@@ -132,17 +204,14 @@ def inicio():
 
 @app.route("/gestion", methods=["GET", "POST"])
 def gestion():
-
     if request.method == "POST":
         nombre = request.form["nombre_temporada"].strip()
 
         if nombre:
-            try:
-                insertar_temporada(nombre)
-            except:
-                pass
+            temporada_id = insertar_temporada(nombre)
+            importar_excel_base(temporada_id)
 
-        return redirect(url_for("gestion"))
+            return redirect(url_for("ver_temporada", temporada_id=temporada_id))
 
     temporadas = obtener_temporadas()
     return render_template("gestion.html", temporadas=temporadas)
@@ -511,12 +580,40 @@ def importar_jugadores(temporada_id):
             archivo.save(ruta_archivo)
 
             wb = openpyxl.load_workbook(ruta_archivo)
-            hoja = wb["JUGADORES"]
 
-            importados = 0
+            # ==========================
+            # 1) IMPORTAR EQUIPOS
+            # ==========================
+            hoja_equipos = wb["EQUIPOS"]
+
+            equipos_importados = 0
+
+            for fila in hoja_equipos.iter_rows(min_row=2, values_only=True):
+                # Estructura esperada:
+                # ID EQUIPO | EQUIPO
+                codigo_equipo, nombre_equipo = fila[:2]
+
+                if not codigo_equipo or not nombre_equipo:
+                    continue
+
+                nombre_limpio = normalizar_nombre_equipo(nombre_equipo)
+
+                insertar_equipo_si_no_existe(
+                    nombre_limpio,
+                    temporada_id,
+                    int(codigo_equipo)
+                )
+                equipos_importados += 1
+
+            # ==========================
+            # 2) IMPORTAR JUGADORES
+            # ==========================
+            hoja_jugadores = wb["JUGADORES"]
+
+            jugadores_importados = 0
             no_encontrados = []
 
-            for fila in hoja.iter_rows(min_row=2, values_only=True):
+            for fila in hoja_jugadores.iter_rows(min_row=2, values_only=True):
                 # Estructura esperada:
                 # ID_Jugador | Nombre_Jugador | Equipo
                 _, nombre_jugador, codigo_equipo = fila[:3]
@@ -528,11 +625,15 @@ def importar_jugadores(temporada_id):
 
                 if equipo:
                     insertar_jugador_si_no_existe(str(nombre_jugador).strip(), equipo[0])
-                    importados += 1
+                    jugadores_importados += 1
                 else:
                     no_encontrados.append((nombre_jugador, codigo_equipo))
 
-            mensaje = f"Importación completada: {importados} jugadores procesados."
+            mensaje = (
+                f"Importación completada: "
+                f"{equipos_importados} equipos procesados y "
+                f"{jugadores_importados} jugadores procesados."
+            )
 
             return render_template(
                 "importar_jugadores.html",
