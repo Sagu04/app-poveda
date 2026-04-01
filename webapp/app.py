@@ -1,9 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for
 import os
 import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-from db import (
+matplotlib.use("Agg")  # MUY IMPORTANTE en Render
+
+from flask import Flask, render_template, request, redirect, url_for
+from webapp.db import (
     crear_tablas,
     obtener_temporadas,
     insertar_temporada,
