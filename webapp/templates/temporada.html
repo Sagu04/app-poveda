@@ -5,24 +5,21 @@
 {% block content %}
     <h1 style="color:red;">PRUEBA TEMPORADA {{ temporada[1] }}</h1>
 
-    <!-- CREAR EQUIPO -->
+   <!-- CREAR EQUIPO -->
     <h2>Crear equipo</h2>
+
     <form method="POST">
         <input type="hidden" name="crear_equipo" value="1">
 
-        <select name="categoria" required>
-            <option value="">Seleccionar categoría</option>
-            <option value="Senior">Senior</option>
-            <option value="Juvenil">Juvenil</option>
-            <option value="Cadete">Cadete</option>
-            <option value="Infantil">Infantil</option>
-            <option value="Alevín">Alevín</option>
-            <option value="Benjamín">Benjamín</option>
-            <option value="Prebenjamín">Prebenjamín</option>
+        <label for="equipo_predefinido"><strong>Seleccionar equipo:</strong></label>
+        <select name="equipo_predefinido" required>
+            <option value="">Seleccionar equipo</option>
+            {% for eq in equipos_base %}
+                <option value="{{ eq.codigo }}">
+                    {{ eq.nombre }} (Código {{ eq.codigo }})
+                </option>
+            {% endfor %}
         </select>
-
-        <input type="text" name="grupo" placeholder="Ej: Masc, Fem, A, B..." required>
-        <input type="number" name="codigo_equipo" placeholder="Código equipo Excel (ej: 1, 2, 3...)">
 
         <button type="submit">Crear equipo</button>
     </form>

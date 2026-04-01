@@ -89,6 +89,28 @@ def normalizar_nombre_equipo(nombre):
 
     return conversiones.get(nombre, nombre.title())
 
+EQUIPOS_BASE = [
+    {"codigo": 1, "nombre": "Senior Masc", "categoria": "Senior", "grupo": "Masc"},
+    {"codigo": 2, "nombre": "Senior Fem", "categoria": "Senior", "grupo": "Fem"},
+    {"codigo": 3, "nombre": "Junior Masc", "categoria": "Junior", "grupo": "Masc"},
+    {"codigo": 4, "nombre": "Junior Fem", "categoria": "Junior", "grupo": "Fem"},
+    {"codigo": 5, "nombre": "Juvenil A", "categoria": "Juvenil", "grupo": "A"},
+    {"codigo": 6, "nombre": "Juvenil B", "categoria": "Juvenil", "grupo": "B"},
+    {"codigo": 7, "nombre": "Juvenil C", "categoria": "Juvenil", "grupo": "C"},
+    {"codigo": 8, "nombre": "Cadete A", "categoria": "Cadete", "grupo": "A"},
+    {"codigo": 9, "nombre": "Cadete B", "categoria": "Cadete", "grupo": "B"},
+    {"codigo": 10, "nombre": "Cadete C", "categoria": "Cadete", "grupo": "C"},
+    {"codigo": 11, "nombre": "Infantil A", "categoria": "Infantil", "grupo": "A"},
+    {"codigo": 12, "nombre": "Infantil B", "categoria": "Infantil", "grupo": "B"},
+    {"codigo": 13, "nombre": "Infantil C", "categoria": "Infantil", "grupo": "C"},
+    {"codigo": 14, "nombre": "Alevín A", "categoria": "Alevín", "grupo": "A"},
+    {"codigo": 15, "nombre": "Alevín B", "categoria": "Alevín", "grupo": "B"},
+    {"codigo": 16, "nombre": "Alevín C", "categoria": "Alevín", "grupo": "C"},
+    {"codigo": 17, "nombre": "Benjamín A", "categoria": "Benjamín", "grupo": "A"},
+    {"codigo": 18, "nombre": "Benjamín B", "categoria": "Benjamín", "grupo": "B"},
+    {"codigo": 19, "nombre": "Prebenjamín", "categoria": "Prebenjamín", "grupo": ""},
+]
+
 def importar_excel_base(temporada_id):
     ruta_archivo = os.path.join(BASE_DIR, "data", "HOJA DE TEST PA APP CON PORTADA .xlsx")
 
@@ -225,16 +247,24 @@ def ver_temporada(temporada_id):
 
         # Crear equipo
         if "crear_equipo" in request.form:
-            categoria = request.form["categoria"].strip()
-            grupo = request.form["grupo"].strip()
-            codigo_equipo = request.form["codigo_equipo"].strip()
+            codigo_seleccionado = request.form.get("equipo_predefinido")
 
-            nombre_equipo = f"{categoria} {grupo}".strip()
+            if codigo_seleccionado:
+                codigo_seleccionado = int(codigo_seleccionado)
 
-            if codigo_equipo:
-                insertar_equipo(nombre_equipo, temporada_id, int(codigo_equipo))
-            else:
-                insertar_equipo(nombre_equipo, temporada_id, None)
+                equipo_seleccionado = next(
+                    (eq for eq in EQUIPOS_BASE if eq["codigo"] == codigo_seleccionado),
+                    None
+                )
+
+                if equipo_seleccionado:
+                    insertar_equipo_si_no_existe(
+                        equipo_seleccionado["nombre"],
+                        temporada_id,
+                        equipo_seleccionado["codigo"]
+                    )
+
+            return redirect(url_for("ver_temporada", temporada_id=temporada_id))
 
         # Crear prueba física
         elif "crear_prueba" in request.form:
@@ -251,7 +281,8 @@ def ver_temporada(temporada_id):
         "temporada.html",
         temporada=temporada,
         equipos=equipos,
-        pruebas=pruebas
+        pruebas=pruebas,
+        equipos_base=EQUIPOS_BASE
     )
 
 
