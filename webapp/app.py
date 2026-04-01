@@ -37,7 +37,8 @@ from webapp.db import (
     obtener_datos_grafica_dinamicos,
     obtener_equipo_por_codigo,
     insertar_jugador_si_no_existe,
-    insertar_equipo_si_no_existe
+    insertar_equipo_si_no_existe,
+    temporada_existe
 )
 
 import os
@@ -229,14 +230,18 @@ def gestion():
     if request.method == "POST":
         nombre = request.form["nombre_temporada"].strip()
 
-        if nombre:
+        if nombre and not temporada_existe(nombre):
             temporada_id = insertar_temporada(nombre)
             importar_excel_base(temporada_id)
 
             return redirect(url_for("ver_temporada", temporada_id=temporada_id))
 
     temporadas = obtener_temporadas()
-    return render_template("gestion.html", temporadas=temporadas)
+    return render_template(
+        "gestion.html",
+        temporadas=temporadas,
+        temporadas_disponibles=generar_temporadas_disponibles()
+    )
 
 
 @app.route("/temporada/<int:temporada_id>", methods=["GET", "POST"])
@@ -682,6 +687,17 @@ def importar_jugadores(temporada_id):
         mensaje=mensaje,
         no_encontrados=[]
     )
+
+def generar_temporadas_disponibles():
+    inicio = 2025
+    temporadas = []
+
+    for i in range(5):
+        año_inicio = inicio + i
+        año_fin = año_inicio + 1
+        temporadas.append(f"{año_inicio}/{año_fin}")
+
+    return temporadas
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

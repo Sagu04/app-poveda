@@ -657,3 +657,13 @@ def insertar_equipo_si_no_existe(nombre, temporada_id, codigo_equipo=None):
 
     conn.commit()
     conn.close()
+
+def temporada_existe(nombre):
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id FROM temporadas WHERE nombre = ?", (nombre,))
+    existe = cursor.fetchone()
+
+    conn.close()
+    return existe is not None

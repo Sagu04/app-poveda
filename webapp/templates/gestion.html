@@ -6,7 +6,14 @@
     <h1>Gestión de Temporadas</h1>
 
     <form method="POST">
-        <input type="text" name="nombre_temporada" placeholder="Ej: 2025/2026" required>
+        <label for="nombre_temporada"><strong>Seleccionar temporada:</strong></label>
+        <select name="nombre_temporada" required>
+            <option value="">Seleccionar temporada</option>
+            {% for t in temporadas_disponibles %}
+                <option value="{{ t }}">{{ t }}</option>
+            {% endfor %}
+        </select>
+
         <button type="submit">Crear temporada</button>
     </form>
 
